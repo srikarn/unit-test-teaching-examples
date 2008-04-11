@@ -1,35 +1,34 @@
 package talk1;
 
-import junit.framework.TestCase;
-
 import common.ExpensiveService;
+import common.StandardExpensiveService;
+
+import junit.framework.TestCase;
 
 /**
  * <code>
- *   +-----------+     +----------------+            +--------------------------+
- *   |    Test *------------------------------SEAM-->| FriendlyExpensiveService |
- *   |   Driver  |     | ClassUnderTest |            |                          |
- *   +-----------+     +----------------+            +--------------------------+
+ *   +-----------+     +------------------+            +--------------------------+
+ *   |    Test   |====>| ClassUnderTest *====NO_SEAM==>| StandardExpensiveService |
+ *   |   Driver  |     |                  |            |                          |
+ *   +-----------+     +------------------+            +--------------------------+
  * </code>
  */
 public class UntestableCodeTest extends TestCase {
 
   /**
-   * This Class does not mixes responsibilities only business logic here. All of
-   * the "new" operators were removed.
+   * This Class mixes responsibilities: (1) Responsibility of constructing the
+   * object graph (2) Responsibility of business logic
+   * 
+   * As a result there is no way we can test it. This class has no seams.
    */
   static class ClassUnderTest {
     /*
-     * Now we are getting the benefit of the interface. Best way to think about
-     * this is that the test is in control of the 'expensive' variable/field. As
-     * a result it can send subclasses and hence can intercept any method call.
-     * Without having control of this method we can't intercept.
+     * Notice that even thought we use an interface here, it does nothing to aid
+     * testing of this class. We are paying the cost of an interface and getting
+     * zero benefit. Having an interface gives us a false sense that we have a
+     * seam here.
      */
-    final ExpensiveService expensive;
-
-    public ClassUnderTest(ExpensiveService expensive) {
-      this.expensive = expensive;
-    }
+    ExpensiveService expensive = new StandardExpensiveService();
 
     public boolean testMe() {
       expensive.untestableMethod();
@@ -37,25 +36,10 @@ public class UntestableCodeTest extends TestCase {
     }
   }
 
-  private static class FriendlyExpensiveService implements ExpensiveService {
-    private final StringBuilder log;
-
-    public FriendlyExpensiveService(StringBuilder log) {
-      this.log = log;
-    }
-
-    public void untestableMethod() {
-      log.append("untestableMethod();");
-    }
-  }
-
-  public void testWeCanPassAFriendlyToTestThis() throws Exception {
-    StringBuilder log = new StringBuilder();
-    ExpensiveService friendlyService = new FriendlyExpensiveService(log);
-    ClassUnderTest cut = new ClassUnderTest(friendlyService);
+  public void testThereIsNothingWeCanDoToTestThis() throws Exception {
+    ClassUnderTest cut = new ClassUnderTest();
     boolean response = cut.testMe();
     assertTrue(response);
-    assertEquals("untestableMethod();", log.toString());
   }
 
 }
