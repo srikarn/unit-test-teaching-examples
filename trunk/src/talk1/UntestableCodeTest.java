@@ -1,9 +1,9 @@
 package talk1;
 
+import junit.framework.TestCase;
+
 import common.ExpensiveService;
 import common.StandardExpensiveService;
-
-import junit.framework.TestCase;
 
 /**
  * <code>
