@@ -1,0 +1,1 @@
+When teaching unit testing and test-driven-development it is great to have a set of examples to play with. This project contains code both before and after refactoring which is both easy and hard to tests to demonstrate different techniques of unit testing.
